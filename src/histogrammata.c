@@ -32,7 +32,7 @@ void print_RGB_values(unsigned width, unsigned height, int input_channels, unsig
 		}
 }
 
-void make_grayscale_pixel_values_array(unsigned width, unsigned height, int input_channels, unsigned char *image, int pixel_values[width][height]){
+void make_grayscale_pixel_values_array(unsigned width, unsigned height, int input_channels, unsigned char *image, int **pixel_values){
 	int x, y;
 
 	for (y=0; y < height; y++) {
@@ -71,9 +71,9 @@ int main(void) {
 
 	unsigned char* image;//, *new_image;
 	unsigned width, height, error;
-	//int pos;
+	int i;//int pos;
 	int input_channels;
-	int pixel_values[256][256];
+	int **pixel_values, *temp;
 
 
 	/*open image + handle error*/
@@ -90,28 +90,35 @@ int main(void) {
 	printf("height = %u\n\n\n", height);
 
 
-	/*put pixel values in an array*/
+	/*allocate a 2D array*/
+	pixel_values = (int **)malloc(width * sizeof(int*));
+	temp = malloc(width * height * sizeof(int));
+	for (i = 0; i < width; i++){
+		pixel_values[i] = temp + (i * height);
+	    }
+
+	/*put pixel values in the array*/
 	make_grayscale_pixel_values_array(width, height, input_channels, image, pixel_values);
 
     /*print pixel values*/
-	//print_pixel_values(width, height, pixel_values);
+	print_pixel_values(width, height, pixel_values);
 
 	/*count different pixel values*/
 	//TO DO
 
 	/*change image*/
-	change_RGB_values(width, height, input_channels, image);
+	//change_RGB_values(width, height, input_channels, image);
 
 	/*print RGB values*/
 	//print_RGB_values(width, height, input_channels, image);
 
 
 	 /*Encode the image + error handling*/
-	 error = lodepng_encode32_file("img_out.png", image, width, height);
+	/* error = lodepng_encode32_file("img_out.png", image, width, height);
 	 if(error){
 		 printf("error %u: %s\n", error, lodepng_error_text(error));}
 	 else{
-		 printf("Image successfully saved!\n");}
+		 printf("Image successfully saved!\n");}*/
 
 	free(image);
 
