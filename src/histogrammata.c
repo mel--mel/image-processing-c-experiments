@@ -119,18 +119,18 @@ int main(void) {
 	//TO DO
 
 	/*change image*/
-	//change_RGB_values(width, height, input_channels, image);
+	change_RGB_values(width, height, input_channels, image);
 
 	/*print RGB values*/
-	//print_RGB_values(width, height, input_channels, image);
+	print_RGB_values(width, height, input_channels, image);
 
 
 	 /*Encode the image + error handling*/
-	/* error = lodepng_encode32_file("img_out.png", image, width, height);
+	 error = lodepng_encode32_file("img_out.png", image, width, height);
 	 if(error){
 		 printf("error %u: %s\n", error, lodepng_error_text(error));}
 	 else{
-		 printf("Image successfully saved!\n");}*/
+		 printf("Image successfully saved!\n");}
 
 	free(image);
 
