@@ -41,7 +41,7 @@ int **allocate_2d_array(unsigned width, unsigned height){
 	if ((temp == NULL) || (array_name == NULL)) {
 		puts("malloc error!!");}
 	else {
-		puts("2d array successfully allocated!!");}
+		puts("2d array successfully allocated!! \n");}
 	for (i = 0; i < width; i++){
 		array_name[i] = temp + (i * height);
 		}
@@ -74,23 +74,41 @@ void change_RGB_values(unsigned width, unsigned height, int input_channels, unsi
 	int x, y, pos;
 
 	for (y=100; y < 150; y++) { // --> first 2 rows
-			//for (y=0; y < height; y++) {
-				for (x=100; x < 150; x++) { //--> first 2 columns
-				//for (x=0; x < width; x++) {
-				    for (pos=0; pos < 3; pos++) {
-				        image[y*width*input_channels + x*input_channels + pos] = 255;
-				        }
-				    }
-				 }
+	//for (y=0; y < height; y++) {
+		for (x=100; x < 150; x++) { //--> first 2 columns
+		//for (x=0; x < width; x++) {
+			for (pos=0; pos < 3; pos++) {
+				image[y*width*input_channels + x*input_channels + pos] = 255;
+			    }
+			}
+		}
+}
+
+void initialize_1d_array(int size, int* array_name){
+	int i;
+
+	for (i = 0; i < size; i++){
+		array_name[i] = 0;
+	}
+}
+
+void count_pixel_values(int width, int height, int **pixel_values, int *count_values){
+	int x, y, temp;
+
+	for (x = 0; x < width; x++){
+		for (y = 0; y < height; y++){
+			temp = pixel_values[x][y];
+			count_values[temp]++;
+		}
+	}
 }
 
 int main(void) {
 
-	unsigned char* image;//, *new_image;
+	unsigned char* image;
 	unsigned width, height, error;
-	int i;//int pos;
-	int input_channels;
-	int **pixel_values;
+	int input_channels, i;
+	int **pixel_values, *count_values;
 
 
 	/*open image + handle error*/
@@ -113,16 +131,20 @@ int main(void) {
 	make_grayscale_pixel_values_array(width, height, input_channels, image, pixel_values);
 
     /*print pixel values*/
-	print_pixel_values(width, height, pixel_values);
+	//print_pixel_values(width, height, pixel_values);
+
+	/*allocate + initialize array to count pixel values*/
+	count_values = (int*)malloc(256*sizeof(int));
+	initialize_1d_array(256, count_values);
 
 	/*count different pixel values*/
-	//TO DO
+	count_pixel_values(width, height, pixel_values, count_values);
 
 	/*change image*/
 	change_RGB_values(width, height, input_channels, image);
 
 	/*print RGB values*/
-	print_RGB_values(width, height, input_channels, image);
+	//print_RGB_values(width, height, input_channels, image);
 
 
 	 /*Encode the image + error handling*/
@@ -132,6 +154,8 @@ int main(void) {
 	 else{
 		 printf("Image successfully saved!\n");}
 
+	/*Deallocate memory*/
+	free(pixel_values);
 	free(image);
 
 	return EXIT_SUCCESS;
