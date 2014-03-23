@@ -59,6 +59,11 @@ void make_grayscale_pixel_values_array(unsigned width, unsigned height, int inpu
 		    }
 }
 
+
+
+
+
+
 void print_pixel_values(unsigned width, unsigned height, int **pixel_values){
 	int x, y;
 
@@ -68,20 +73,6 @@ void print_pixel_values(unsigned width, unsigned height, int **pixel_values){
 				}
 			printf("\n");
 			}
-}
-
-void change_RGB_values(unsigned width, unsigned height, int input_channels, unsigned char *image){
-	int x, y, pos;
-
-	for (y=100; y < 150; y++) { // --> first 2 rows
-	//for (y=0; y < height; y++) {
-		for (x=100; x < 150; x++) { //--> first 2 columns
-		//for (x=0; x < width; x++) {
-			for (pos=0; pos < 3; pos++) {
-				image[y*width*input_channels + x*input_channels + pos] = 255;
-			    }
-			}
-		}
 }
 
 void initialize_1d_array(int size, int* array_name){
@@ -103,12 +94,41 @@ void count_pixel_values(int width, int height, int **pixel_values, int *count_va
 	}
 }
 
+void histogram_equalization(int width, int height, int **pixel_values, int *count_values, int **new_pixel_values){
+	int x, y, z;
+	double acc;
+
+	for (x = 0; x < width; x++){
+		for (y = 0; y < height; y++){
+			acc = 0;
+			for (z = 0; z < pixel_values[x][y]; z++){
+				acc += (double)count_values[z]/((double)(width * height));
+			}
+		    new_pixel_values[x][y] = (int)(acc*255);
+		    //printf("%f\n", &acc);
+		}
+	}
+}
+
+void change_RGB_values(unsigned width, unsigned height, int input_channels, unsigned char *image, int **new_pixel_values){
+	int x, y, pos;
+
+	for (y=0; y < height; y++) {
+		for (x=0; x < width; x++) {
+			for (pos=0; pos < 3; pos++) {
+				image[y*width*input_channels + x*input_channels + pos] = new_pixel_values[y][x];
+			    }
+			//printf("%d\n", image[y*width*input_channels + x*input_channels]);
+			}
+		}
+}
+
 int main(void) {
 
 	unsigned char* image;
 	unsigned width, height, error;
-	int input_channels, i;
-	int **pixel_values, *count_values;
+	int input_channels;
+	int **pixel_values, *count_values, **new_pixel_values;
 
 
 	/*open image + handle error*/
@@ -124,7 +144,7 @@ int main(void) {
 	printf("\nwidth = %u\n", width);
 	printf("height = %u\n\n\n", height);
 
-	/*allocate a 2D array*/
+	/*allocate pixel values 2D array*/
     pixel_values = allocate_2d_array(width, height);
 
 	/*put pixel values in the array*/
@@ -140,8 +160,14 @@ int main(void) {
 	/*count different pixel values*/
 	count_pixel_values(width, height, pixel_values, count_values);
 
+	/*allocate pixel values 2D array*/
+	new_pixel_values = allocate_2d_array(width, height);
+
+	/*histogram equalization*/
+	histogram_equalization(width, height, pixel_values, count_values, new_pixel_values);
+
 	/*change image*/
-	change_RGB_values(width, height, input_channels, image);
+	change_RGB_values(width, height, input_channels, image, new_pixel_values);
 
 	/*print RGB values*/
 	//print_RGB_values(width, height, input_channels, image);
